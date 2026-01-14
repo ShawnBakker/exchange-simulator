@@ -1,4 +1,4 @@
-import { Order, Trade, Side } from '../types'; // keep side for future implementations, not necessarily needed now
+import { Order, Trade} from '../types'; // keep side for future implementations, not necessarily needed now
 import { OrderBook } from '../engine/orderbook';
 
 let orderSeq = 0;

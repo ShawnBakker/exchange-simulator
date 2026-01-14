@@ -37,8 +37,8 @@ export class PriceProcess {
 
   peek(steps = 1): number {
     // simulate future without changing state - for informed traders
-    const saved = this.value;
-    const savedState = this.rng;
+     // const saved = this.value;
+     // const savedState = this.rng;
     
     let future = this.value;
     for (let i = 0; i < steps; i++) {
