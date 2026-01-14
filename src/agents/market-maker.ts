@@ -1,4 +1,4 @@
-import { Order, Trade, Side } from '../types';
+import { Order, Trade, Side } from '../types'; // keep side for future implementations, not necessarily needed now
 import { OrderBook } from '../engine/orderbook';
 
 let orderSeq = 0;
@@ -40,8 +40,7 @@ export class MarketMaker {
       this.inventory += trade.qty;
     }
 
-    // mark-to-market the inventory change
-    // (simplified: just track realized pnl from spread capture vs adverse moves)
+    // just track realized pnl from spread capture vs adverse moves
     const midAtTrade = trade.trueValue;
     const slippage = (trueValueAfter - midAtTrade) * 
       (trade.takerSide === 'buy' ? -1 : 1) * trade.qty;
