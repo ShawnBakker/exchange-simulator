@@ -403,7 +403,7 @@ export default function ExchangeSimulator() {
             ADVERSE SELECTION SIMULATOR
           </h1>
           <p style={{ margin: '8px 0 0', fontSize: 12, color: '#666', maxWidth: 600 }}>
-            Watch how informed order flow (toxic flow) impacts market maker profitability and forces spread widening.
+            informed order flow (toxic flow) impacts market maker profitability and forces spread widening.
           </p>
         </header>
 
@@ -528,7 +528,7 @@ export default function ExchangeSimulator() {
         </div>
 
         <footer style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', fontSize: 11, color: '#444' }}>
-          Demonstrates adverse selection: when informed traders dominate, the market maker loses money and must widen spreads to survive.
+          adverse selection: when informed traders dominate, the market maker loses money and needs to widen spread.
         </footer>
       </div>
     </div>
