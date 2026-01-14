@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
+=======
+>>>>>>> dev
 node_modules/
 dist/
 .DS_Store
@@ -9,4 +12,7 @@ dist/
 .env.local
 coverage/
 .vite/
+<<<<<<< HEAD
 >>>>>>> c5c05ce (repo outline)
+=======
+>>>>>>> dev
