@@ -2,8 +2,6 @@
 
 A real-time exchange simulator demonstrating how informed order flow impacts market maker profitability and forces spread widening.
 
-![screenshot](screenshot.png)
-
 ## What is this?
 
 Market makers provide liquidity by posting bid/ask quotes. They profit from the spread—buying low, selling high. But when *informed traders* (those with better information about the asset's true value) show up, they systematically pick off the market maker's quotes right before prices move. This is **adverse selection**.
