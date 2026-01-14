@@ -10,9 +10,9 @@ Market makers provide liquidity by posting bid/ask quotes. They profit from the 
 
 This simulator lets you see it happen in real-time:
 
-- Watch the market maker's P&L crash when informed flow dominates
-- See spreads automatically widen as the MM adapts to protect itself
-- Compare outcomes under different toxicity levels
+- See how the market maker's P&L crash when informed flow dominates
+- Spreads automatically widen as the MM adapts to protect itself
+- You'll be able to compare outcomes under different toxicity levels
 
 ## Local Run
 
@@ -52,9 +52,9 @@ src/
 
 ## Things to try
 
-1. **Baseline**: Set informed flow to 0%. MM should steadily profit.
-2. **Toxic flow**: Crank informed to 60%+. Watch P&L tank and spread blow out.
-3. **High volatility + high toxicity**: The worst case. Spread goes crazy.
+1. **Baseline**: Informed flow to 0%. MM should steadily profit.
+2. **Toxic flow**: You can set informed to 60%+. Watch P&L tank and spread blow out.
+3. **High volatility + high toxicity**: The worst case, leads to spread going crazy.
 
 ## References
 
