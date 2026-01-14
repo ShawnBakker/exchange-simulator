@@ -1,9 +1,9 @@
-import { Config, Trade, Metrics, BookSnapshot } from '../types';
-import { Rng } from '../engine/rng';
-import { OrderBook } from '../engine/orderbook';
-import { PriceProcess } from '../engine/price-process';
-import { MarketMaker } from '../agents/market-maker';
-import { NoiseTrader, InformedTrader } from '../agents/traders';
+import { Rng } from './engine/rng';
+import { OrderBook } from './engine/orderbook';
+import { PriceProcess } from './engine/price-process';
+import { MarketMaker } from './agents/market-maker';
+import { NoiseTrader, InformedTrader } from './agents/traders';
+import { Config, Trade, Metrics, BookSnapshot } from './types';
 
 export interface SimState {
   tick: number;
