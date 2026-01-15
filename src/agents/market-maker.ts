@@ -1,4 +1,4 @@
-import { Order, Trade} from '../types'; // keep side for future implementations, not necessarily needed now
+import { Order, Trade } from '../types';
 import { OrderBook } from '../engine/orderbook';
 
 let orderSeq = 0;
@@ -40,7 +40,6 @@ export class MarketMaker {
       this.inventory += trade.qty;
     }
 
-    // just track realized pnl from spread capture vs adverse moves
     const midAtTrade = trade.trueValue;
     const slippage = (trueValueAfter - midAtTrade) * 
       (trade.takerSide === 'buy' ? -1 : 1) * trade.qty;
@@ -61,11 +60,9 @@ export class MarketMaker {
     const adverseRatio = this.recentTrades.filter(t => t.adverse).length / 
                          this.recentTrades.length;
 
-    // widen if seeing lots of adverse flow, tighten if mostly noise
     const target = this.baseSpread * (1 + adverseRatio * 3);
     this.currentSpread += (target - this.currentSpread) * this.adaptRate;
-    
-    // floor at base spread
+
     this.currentSpread = Math.max(this.baseSpread * 0.5, this.currentSpread);
   }
 
