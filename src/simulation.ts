@@ -187,5 +187,6 @@ export const defaultConfig: Config = {
   tickMs: 100,
   ticks: 1000
 };
-// ui usage
+
+// UI usage
 export { INFORMED_EDGE_THRESHOLD };
