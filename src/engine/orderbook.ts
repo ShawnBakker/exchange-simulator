@@ -1,4 +1,4 @@
-import { Order, OrderId, Trade, Level, BookSnapshot } from '../types';
+import { Order, OrderId, Trade, Level, BookSnapshot } from './types';
 
 let tradeSeq = 0;
 
