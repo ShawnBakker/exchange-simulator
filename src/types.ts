@@ -1,74 +1,60 @@
-export type OrderId = string;
-export type TraderId = string;
+import { Order, Side } from '../types';
+import { Rng } from '../engine/rng';
 
-export type Side = 'buy' | 'sell';
-export type OrderType = 'limit' | 'market';
-export type TraderType = 'mm' | 'informed' | 'noise';
+let orderSeq = 0;
 
-export interface Order {
-  id: OrderId;
-  traderId: TraderId;
-  traderType: TraderType;
-  side: Side;
-  type: OrderType;
-  price: number;
-  qty: number;
-  filled: number;
-  ts: number;
+export class NoiseTrader {
+  constructor(private rng: Rng) {}
+
+  maybeOrder(ts: number, arrivalProb: number): Order | null {
+    if (!this.rng.bool(arrivalProb)) return null;
+
+    const side: Side = this.rng.bool() ? 'buy' : 'sell';
+    const qty = this.rng.int(1, 10);
+
+    return {
+      id: `noise-${++orderSeq}`,
+      traderId: `noise-${orderSeq}`,
+      traderType: 'noise',
+      side,
+      type: 'market',
+      price: 0,
+      qty,
+      filled: 0,
+      ts
+    };
+  }
 }
 
-export interface Trade {
-  id: string;
-  ts: number;
-  price: number;
-  qty: number;
-  takerOrderId: OrderId;
-  takerId: TraderId;
-  takerSide: Side;
-  takerType: TraderType;
-  makerOrderId: OrderId;
-  makerId: TraderId;
-  makerType: TraderType;
-  trueValue: number;
-}
+export class InformedTrader {
+  constructor(private rng: Rng) {}
 
-export interface Level {
-  price: number;
-  orders: Order[];
-}
+  maybeOrder(
+    ts: number,
+    arrivalProb: number,
+    currentPrice: number,
+    trueValue: number
+  ): Order | null {
+    if (!this.rng.bool(arrivalProb)) return null;
 
-export interface BookSnapshot {
-  ts: number;
-  bids: Level[];
-  asks: Level[];
-  bestBid: number | null;
-  bestAsk: number | null;
-}
+    const edge = (trueValue - currentPrice) / currentPrice;
+    const threshold = 0.0005; // 5 bps minimum edge
 
-export interface Metrics {
-  ts: number;
-  trueValue: number;
-  mid: number | null;
-  spread: number | null;
-  mmPnl: number;
-  mmInventory: number;
-  mmSpread: number;
-  tradeCount: number;
-  informedCount: number;
-  adverseCount: number;
-}
+    if (Math.abs(edge) < threshold) return null;
 
-export interface Config {
-  seed: number;
-  initialPrice: number;
-  volatility: number;
-  jumpProb: number;
-  jumpSize: number;
-  mmBaseSpread: number;
-  mmSize: number;
-  mmAdaptRate: number;
-  informedRatio: number;
-  arrivalRate: number;
-  tickMs: number;
-  ticks: number;
+    const side: Side = edge > 0 ? 'buy' : 'sell';
+    const qty = this.rng.int(5, 20); 
+
+    return {
+      id: `inf-${++orderSeq}`,
+      traderId: `informed-${orderSeq}`,
+      traderType: 'informed',
+      side,
+      type: 'market',
+      price: 0,
+      qty,
+      filled: 0,
+      ts
+    };
+  }
 }
