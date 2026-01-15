@@ -1,9 +1,9 @@
+import { Config, Trade, Metrics, BookSnapshot } from './types';
 import { Rng } from './engine/rng';
 import { OrderBook } from './engine/orderbook';
 import { PriceProcess } from './engine/price-process';
 import { MarketMaker } from './agents/market-maker';
 import { NoiseTrader, InformedTrader } from './agents/traders';
-import { Config, Trade, Metrics, BookSnapshot } from './types';
 
 export interface SimState {
   tick: number;
@@ -61,11 +61,12 @@ export class Simulation {
     const ts = this.tick * this.config.tickMs;
     const tickTrades: Trade[] = [];
 
-    // mm quotes
     const quotes = this.mm.quote(this.book, ts);
     quotes.forEach(o => this.book.submit(o));
 
-    // incoming order flow
+    const { newValue } = this.priceProcess.step();
+    this.book.trueValue = newValue;
+
     const isInformed = this.rng.bool(this.config.informedRatio);
     
     let order;
@@ -73,8 +74,8 @@ export class Simulation {
       order = this.informedTrader.maybeOrder(
         ts,
         this.config.arrivalRate,
-        this.book.mid ?? this.priceProcess.value,
-        this.priceProcess.value
+        this.book.mid ?? newValue,
+        newValue
       );
     } else {
       order = this.noiseTrader.maybeOrder(ts, this.config.arrivalRate);
@@ -85,11 +86,6 @@ export class Simulation {
       tickTrades.push(...trades);
     }
 
-    // move true value
-    const { newValue } = this.priceProcess.step();
-    this.book.trueValue = newValue;
-
-    // update mm state
     tickTrades.forEach(t => this.mm.onTrade(t, newValue));
     
     this.allTrades.push(...tickTrades);
