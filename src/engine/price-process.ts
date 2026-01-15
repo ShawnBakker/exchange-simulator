@@ -36,15 +36,13 @@ export class PriceProcess {
   }
 
   peek(steps = 1): number {
-    // simulate future without changing state - for informed traders
-     // const saved = this.value;
-     // const savedState = this.rng;
-    
+    const tempRng = this.rng.clone();
     let future = this.value;
+    
     for (let i = 0; i < steps; i++) {
-      const diff = this.rng.normal(0, this.vol);
-      const jump = this.rng.bool(this.jumpProb) 
-        ? (this.rng.bool() ? this.jumpSize : -this.jumpSize) 
+      const diff = tempRng.normal(0, this.vol);
+      const jump = tempRng.bool(this.jumpProb) 
+        ? (tempRng.bool() ? this.jumpSize : -this.jumpSize) 
         : 0;
       future = Math.max(0.01, future * (1 + diff + jump));
     }
