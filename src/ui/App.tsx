@@ -187,7 +187,7 @@ export default function ExchangeSimulator() {
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
         <header style={{ marginBottom: 24, borderBottom: '1px solid #1a1a2e', paddingBottom: 16 }}>
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 500, color: '#8b5cf6', letterSpacing: 1 }}>ADVERSE SELECTION SIMULATOR</h1>
-          <p style={{ margin: '8px 0 0', fontSize: 12, color: '#666', maxWidth: 700 }}>Watch how informed order flow impacts market maker profitability. MM skews quotes based on inventory.</p>
+          <p style={{ margin: '8px 0 0', fontSize: 12, color: '#666', maxWidth: 700 }}>See how informed order flow impacts market maker profitability. The MM skews quotes based on inventory.</p>
         </header>
 
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 20 }}>
@@ -299,7 +299,7 @@ export default function ExchangeSimulator() {
         </div>
 
         <footer style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', fontSize: 11, color: '#444' }}>
-          <p style={{ margin: 0 }}>Demonstrates adverse selection: when informed traders dominate, the market maker loses money and must widen spreads.</p>
+          <p style={{ margin: 0 }}>Demonstrates adverse selection: if informed traders dominate, the market maker loses money and has to widen spreads.</p>
           <p style={{ margin: '8px 0 0', color: '#333' }}>Edge threshold: {(INFORMED_EDGE_THRESHOLD * 10000).toFixed(0)} bps | Inventory skew shifts quotes to flatten position risk.</p>
         </footer>
       </div>
