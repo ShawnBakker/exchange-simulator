@@ -1,5 +1,5 @@
-import { Order, Side } from '../types';
-import { Rng } from '../engine/rng';
+import { Order, Side } from './types';
+import { Rng } from './engine/rng';
 
 let orderSeq = 0;
 
