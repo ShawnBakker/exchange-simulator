@@ -3,6 +3,7 @@ import { OrderBook } from '../engine/orderbook';
 
 let orderSeq = 0;
 
+/** Reset order sequence (call on simulation reset) */
 export function resetMMSeq() {
   orderSeq = 0;
 }
@@ -22,7 +23,7 @@ export class MarketMaker {
   private size: number;
   private adaptRate: number;
   
-  /** Inventory skew factor: how much to shift quotes per unit of inventory */
+
   private inventorySkewFactor: number;
 
   pnl = 0;
@@ -30,7 +31,6 @@ export class MarketMaker {
   private recentTrades: { adverse: boolean; ts: number }[] = [];
   private readonly windowSize = 20;
 
-  // Enhanced statistics
   private _spreadPnl = 0;
   private _inventoryPnl = 0;
   private _totalSpreadCaptured = 0;
@@ -41,7 +41,7 @@ export class MarketMaker {
     baseSpread: number, 
     size: number, 
     adaptRate: number,
-    inventorySkewFactor = 0.0005 // default: 0.5 bps per unit
+    inventorySkewFactor = 0.0005 // .5bps
   ) {
     this.baseSpread = baseSpread;
     this.currentSpread = baseSpread;
@@ -87,10 +87,11 @@ export class MarketMaker {
       this.inventory += trade.qty;
     }
 
-    // Mark-to-market P&L from price movement on existing inventory
     const priceMove = trueValueAfter - trade.trueValue;
     const inventoryMtm = prevInventory * priceMove;
     this._inventoryPnl += inventoryMtm;
+
+    // Total P&L
     this.pnl = this._spreadPnl + this._inventoryPnl;
 
     this.recentTrades.push({ adverse: wasAdverse, ts: trade.ts });
@@ -121,7 +122,7 @@ export class MarketMaker {
     const mid = book.mid ?? book.trueValue;
     const halfSpread = this.currentSpread / 2;
 
-    // Inventory skew: shift quotes to encourage inventory-reducing trades
+    // Inventory skew for shift quotes to encourage inventory-reducing trades
     const skew = this.inventory * this.inventorySkewFactor;
 
     const bidPrice = Math.round((mid - halfSpread - skew) * 100) / 100;
@@ -159,6 +160,7 @@ export class MarketMaker {
     return this.recentTrades.filter(t => t.adverse).length / this.recentTrades.length;
   }
 
+  /** Reset state for new simulation run */
   reset(baseSpread: number, size: number, adaptRate: number) {
     this.baseSpread = baseSpread;
     this.currentSpread = baseSpread;
