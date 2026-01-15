@@ -23,7 +23,6 @@ export class MarketMaker {
   private size: number;
   private adaptRate: number;
   
-
   private inventorySkewFactor: number;
 
   pnl = 0;
@@ -35,13 +34,12 @@ export class MarketMaker {
   private _inventoryPnl = 0;
   private _totalSpreadCaptured = 0;
   private _fillCount = 0;
-  private _avgEntryPrice = 0;
 
   constructor(
     baseSpread: number, 
     size: number, 
     adaptRate: number,
-    inventorySkewFactor = 0.0005 // .5bps
+    inventorySkewFactor = 0.0005 // 0.5 bps per unit
   ) {
     this.baseSpread = baseSpread;
     this.currentSpread = baseSpread;
@@ -70,20 +68,18 @@ export class MarketMaker {
     const wasAdverse = trade.takerType === 'informed';
     const prevInventory = this.inventory;
     
-    // Calculate spread captured on this trade
     const spreadCaptured = trade.takerSide === 'buy'
-      ? (trade.price - trade.trueValue) * trade.qty  
-      : (trade.trueValue - trade.price) * trade.qty; 
+      ? (trade.price - trade.trueValue) * trade.qty  // sold above true value
+      : (trade.trueValue - trade.price) * trade.qty; // bought below true value
     
     this._spreadPnl += spreadCaptured;
     this._totalSpreadCaptured += Math.abs(spreadCaptured);
     this._fillCount++;
 
+    // Update inventory and track average entry
     if (trade.takerSide === 'buy') {
-      // we sold
       this.inventory -= trade.qty;
     } else {
-      // we bought
       this.inventory += trade.qty;
     }
 
@@ -91,7 +87,6 @@ export class MarketMaker {
     const inventoryMtm = prevInventory * priceMove;
     this._inventoryPnl += inventoryMtm;
 
-    // Total P&L
     this.pnl = this._spreadPnl + this._inventoryPnl;
 
     this.recentTrades.push({ adverse: wasAdverse, ts: trade.ts });
@@ -108,11 +103,8 @@ export class MarketMaker {
     const adverseRatio = this.recentTrades.filter(t => t.adverse).length / 
                          this.recentTrades.length;
 
-    // Spread widens with adverse selection
     const target = this.baseSpread * (1 + adverseRatio * 3);
     this.currentSpread += (target - this.currentSpread) * this.adaptRate;
-
-    // Floor at half base spread
     this.currentSpread = Math.max(this.baseSpread * 0.5, this.currentSpread);
   }
 
@@ -173,6 +165,5 @@ export class MarketMaker {
     this._inventoryPnl = 0;
     this._totalSpreadCaptured = 0;
     this._fillCount = 0;
-    this._avgEntryPrice = 0;
   }
 }
