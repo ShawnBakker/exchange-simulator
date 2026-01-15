@@ -3,6 +3,10 @@ import { Rng } from '../engine/rng';
 
 let orderSeq = 0;
 
+export function resetTraderSeq() {
+  orderSeq = 0;
+}
+
 export class NoiseTrader {
   constructor(private rng: Rng) {}
 
@@ -26,6 +30,9 @@ export class NoiseTrader {
   }
 }
 
+/** Minimum edge (in %) required for informed trader to act */
+export const INFORMED_EDGE_THRESHOLD = 0.001; // 10 bps
+
 export class InformedTrader {
   constructor(private rng: Rng) {}
 
@@ -37,11 +44,9 @@ export class InformedTrader {
   ): Order | null {
     if (!this.rng.bool(arrivalProb)) return null;
 
-    // only trade if there's edge - true value differs from market
     const edge = (trueValue - currentPrice) / currentPrice;
-    const threshold = 0.001; // 10 bps minimum edge
 
-    if (Math.abs(edge) < threshold) return null;
+    if (Math.abs(edge) < INFORMED_EDGE_THRESHOLD) return null;
 
     const side: Side = edge > 0 ? 'buy' : 'sell';
     const qty = this.rng.int(5, 20); // informed trade larger
