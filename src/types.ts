@@ -71,7 +71,6 @@ export interface Config {
   mmBaseSpread: number;
   mmSize: number;
   mmAdaptRate: number;
-  /** Inventory skew factor for MM quotes */
   mmInventorySkew: number;
   informedRatio: number;
   arrivalRate: number;
