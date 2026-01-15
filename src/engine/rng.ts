@@ -5,6 +5,22 @@ export class Rng {
     this.s = seed >>> 0;
   }
 
+  get state(): number {
+    return this.s;
+  }
+
+  /** Restore */
+  set state(s: number) {
+    this.s = s >>> 0;
+  }
+
+  /** Create an independent clone with the same state */
+  clone(): Rng {
+    const copy = new Rng(0);
+    copy.s = this.s;
+    return copy;
+  }
+
   next(): number {
     this.s = (1664525 * this.s + 1013904223) >>> 0;
     return this.s / 0x100000000;
