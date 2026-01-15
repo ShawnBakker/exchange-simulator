@@ -1,9 +1,9 @@
 import { Config, Trade, Metrics, BookSnapshot } from './types';
 import { Rng } from './engine/rng';
-import { OrderBook } from './engine/orderbook';
+import { OrderBook, resetTradeSeq } from './engine/orderbook';
 import { PriceProcess } from './engine/price-process';
-import { MarketMaker } from './agents/market-maker';
-import { NoiseTrader, InformedTrader } from './agents/traders';
+import { MarketMaker, resetMMSeq } from './agents/market-maker';
+import { NoiseTrader, InformedTrader, resetTraderSeq, INFORMED_EDGE_THRESHOLD } from './agents/traders';
 
 export interface SimState {
   tick: number;
@@ -30,6 +30,12 @@ export class Simulation {
 
   constructor(config: Config) {
     this.config = config;
+    
+    // Reset all sequence counters for determinism
+    resetTradeSeq();
+    resetMMSeq();
+    resetTraderSeq();
+    
     this.rng = new Rng(config.seed);
     this.book = new OrderBook();
     
@@ -44,7 +50,8 @@ export class Simulation {
     this.mm = new MarketMaker(
       config.mmBaseSpread,
       config.mmSize,
-      config.mmAdaptRate
+      config.mmAdaptRate,
+      config.mmInventorySkew
     );
 
     this.noiseTrader = new NoiseTrader(this.rng);
@@ -98,6 +105,8 @@ export class Simulation {
     const adverseCount = this.allTrades.filter(t => 
       t.makerType === 'mm' && t.takerType === 'informed'
     ).length;
+    
+    const stats = this.mm.stats;
 
     return {
       ts,
@@ -109,7 +118,11 @@ export class Simulation {
       mmSpread: this.mm.quotedSpread,
       tradeCount: this.allTrades.length,
       informedCount,
-      adverseCount
+      adverseCount,
+      spreadPnl: stats.spreadPnl,
+      inventoryPnl: stats.inventoryPnl,
+      avgRealizedSpread: stats.avgRealizedSpread,
+      fillCount: stats.fillCount
     };
   }
 
@@ -168,8 +181,11 @@ export const defaultConfig: Config = {
   mmBaseSpread: 0.10,
   mmSize: 100,
   mmAdaptRate: 0.1,
+  mmInventorySkew: 0.0005,
   informedRatio: 0.2,
   arrivalRate: 0.3,
   tickMs: 100,
   ticks: 1000
 };
+// ui usage
+export { INFORMED_EDGE_THRESHOLD };
