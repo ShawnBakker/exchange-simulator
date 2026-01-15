@@ -123,6 +123,20 @@ export class OrderBook {
     toCancel.forEach(id => this.cancel(id));
   }
 
+  getLevels() {
+    const bids = [...this.bids.entries()]
+      .filter(([_, o]) => o.length > 0)
+      .map(([p, o]) => ({ price: p, qty: o.reduce((s, x) => s + x.qty - x.filled, 0) }))
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 5);
+    const asks = [...this.asks.entries()]
+      .filter(([_, o]) => o.length > 0)
+      .map(([p, o]) => ({ price: p, qty: o.reduce((s, x) => s + x.qty - x.filled, 0) }))
+      .sort((a, b) => a.price - b.price)
+      .slice(0, 5);
+    return { bids, asks };
+  }
+
   snapshot(ts: number): BookSnapshot {
     const toLevels = (book: Map<number, Order[]>, desc: boolean): Level[] => {
       return [...book.entries()]
