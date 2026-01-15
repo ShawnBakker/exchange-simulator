@@ -2,6 +2,11 @@ import { Order, OrderId, Trade, Level, BookSnapshot } from '../types';
 
 let tradeSeq = 0;
 
+/** Reset trade sequence (call on simulation reset) */
+export function resetTradeSeq() {
+  tradeSeq = 0;
+}
+
 export class OrderBook {
   private bids: Map<number, Order[]> = new Map();
   private asks: Map<number, Order[]> = new Map();
