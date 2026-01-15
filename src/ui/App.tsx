@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, ReferenceLine } from 'recharts';
+
+// sim engine
 
 class Rng {
   private s: number;
@@ -239,10 +241,14 @@ class Simulation {
   step() {
     const ts = this.tick * 100;
 
-    // mm quotes
+    // mm quotes first (based on old true value)
     this.mm.quote(this.book, ts).forEach(o => this.book.submit(o));
 
-    // order flow
+    const diff = this.rng.normal(0, this.config.volatility);
+    const jump = this.rng.bool(this.config.jumpProb) ? (this.rng.bool() ? this.config.jumpSize : -this.config.jumpSize) : 0;
+    this.trueValue = Math.max(0.01, this.trueValue * (1 + diff + jump));
+    this.book.trueValue = this.trueValue;
+
     const isInformed = this.rng.bool(this.config.informedRatio);
     let order: Order | null = null;
 
@@ -250,7 +256,7 @@ class Simulation {
       if (isInformed) {
         const mid = this.book.mid ?? this.trueValue;
         const edge = (this.trueValue - mid) / mid;
-        if (Math.abs(edge) > 0.001) {
+        if (Math.abs(edge) > 0.0005) {
           order = {
             id: `inf-${++orderSeq}`, traderId: `inf-${orderSeq}`, traderType: 'informed',
             side: edge > 0 ? 'buy' : 'sell', type: 'market', price: 0,
@@ -268,12 +274,6 @@ class Simulation {
 
     let tickTrades: Trade[] = [];
     if (order) tickTrades = this.book.submit(order);
-
-    // move price
-    const diff = this.rng.normal(0, this.config.volatility);
-    const jump = this.rng.bool(this.config.jumpProb) ? (this.rng.bool() ? this.config.jumpSize : -this.config.jumpSize) : 0;
-    this.trueValue = Math.max(0.01, this.trueValue * (1 + diff + jump));
-    this.book.trueValue = this.trueValue;
 
     tickTrades.forEach(t => this.mm.onTrade(t, this.trueValue));
     this.allTrades.push(...tickTrades);
@@ -304,8 +304,6 @@ class Simulation {
     this.allTrades = [];
   }
 }
-
-// ============ REACT UI ============
 
 const defaultConfig: SimConfig = {
   seed: 42,
@@ -403,7 +401,7 @@ export default function ExchangeSimulator() {
             ADVERSE SELECTION SIMULATOR
           </h1>
           <p style={{ margin: '8px 0 0', fontSize: 12, color: '#666', maxWidth: 600 }}>
-            informed order flow (toxic flow) impacts market maker profitability and forces spread widening.
+            Watch how informed order flow (toxic flow) impacts market maker profitability and forces spread widening.
           </p>
         </header>
 
@@ -528,7 +526,7 @@ export default function ExchangeSimulator() {
         </div>
 
         <footer style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #1a1a2e', fontSize: 11, color: '#444' }}>
-          adverse selection: when informed traders dominate, the market maker loses money and needs to widen spread.
+          Demonstrates adverse selection: when informed traders dominate, the market maker loses money and must widen spreads to survive.
         </footer>
       </div>
     </div>
